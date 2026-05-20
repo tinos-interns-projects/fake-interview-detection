@@ -437,289 +437,252 @@
 //   );
 
 // }
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback
+} from 'react';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Navigate } from 'react-router-dom';
 
-import { apiStart, apiStop, apiStatus, videoFeedUrl, reportUrl } from '../utils/api';
+import {
+  apiStart,
+  apiStop,
+  apiStatus,
+  videoFeedUrl
+} from '../utils/api';
 
 import ScoreRing from '../components/ScoreRing';
-
 import StatusBadge from '../components/StatusBadge';
-
 import QuestionsPanel from '../components/QuestionsPanel';
-
 import QuestionReportModal from '../components/QuestionReportModal';
 
 import './DashboardPage.css';
-
 import '../components/QuestionsPanel.css';
-
-
 
 const POLL_INTERVAL = 1000;
 
 
-
-// ── RESULT MODAL ──────────────────────────────────────────
-
+// RESULT MODAL
 function ResultModal({ summary, onClose }) {
 
-  const { verdict, avgScore, maxScore, total, suspCount } = summary;
+  const {
+    verdict,
+    avgScore,
+    maxScore,
+    total,
+    suspCount
+  } = summary;
 
+  const icon =
+    verdict === 'Suspicious'
+      ? '⚠'
+      : verdict === 'Warning'
+      ? '⚡'
+      : '✓';
 
-
-  const isSuspicious = verdict === 'Suspicious';
-
-  const isWarning    = verdict === 'Warning';
-
-  const isNormal     = verdict === 'Normal';
-
-
-
-  const icon      = isSuspicious ? '⚠' : isWarning ? '⚡' : isNormal ? '✓' : '—';
-
-  const color     = isSuspicious ? 'var(--danger)' : isWarning ? 'var(--warn)' : 'var(--ok)';
-
-  const glowClass = isSuspicious ? 'modal-verdict--danger'
-
-                  : isWarning    ? 'modal-verdict--warn'
-
-                  : 'modal-verdict--ok';
-
-
-
-  useEffect(() => {
-
-    const handler = e => { if (e.key === 'Escape') onClose(); };
-
-    window.addEventListener('keydown', handler);
-
-    return () => window.removeEventListener('keydown', handler);
-
-  }, [onClose]);
-
-
+  const color =
+    verdict === 'Suspicious'
+      ? 'var(--danger)'
+      : verdict === 'Warning'
+      ? 'var(--warn)'
+      : 'var(--ok)';
 
   return (
 
-    <div className="modal-overlay" onClick={onClose}>
+    <div
+      className="modal-overlay"
+      onClick={onClose}
+    >
 
-      <div className="modal-box animate-fade-in" onClick={e => e.stopPropagation()}>
+      <div
+        className="modal-box"
+        onClick={(e) => e.stopPropagation()}
+      >
 
-        <div className="modal-bar" style={{ background: color }} />
+        <div
+          className="modal-bar"
+          style={{ background: color }}
+        />
 
-        <button className="modal-close" onClick={onClose}>✕</button>
+        <button
+          className="modal-close"
+          onClick={onClose}
+        >
+          ✕
+        </button>
 
+        <div className="modal-verdict">
 
+          <span>{icon}</span>
 
-        <div className={`modal-verdict ${glowClass}`}>
-
-          <span className="modal-verdict__icon">{icon}</span>
-
-          <span className="modal-verdict__label">{verdict}</span>
+          <span>{verdict}</span>
 
         </div>
 
-
-
-        <h2 className="modal-title">Session Complete</h2>
-
-        <p className="modal-subtitle serif">Final detection summary for this session</p>
-
-
+        <h2>Session Complete</h2>
 
         <div className="modal-stats">
 
-          <ModalStat label="Avg Risk Score"    value={avgScore}  color={color} />
+          <ModalStat
+            label="Avg Score"
+            value={avgScore}
+          />
 
-          <ModalStat label="Peak Risk Score"   value={maxScore}  color={color} />
+          <ModalStat
+            label="Peak Score"
+            value={maxScore}
+          />
 
-          <ModalStat label="Total Frames"      value={total} />
+          <ModalStat
+            label="Frames"
+            value={total}
+          />
 
-          <ModalStat label="Suspicious Events" value={suspCount}
-
-            color={suspCount > 0 ? 'var(--danger)' : 'var(--ok)'} />
-
-        </div>
-
-
-
-        <div className={`modal-message ${glowClass}`}>
-
-          {isSuspicious && '🚨 High suspicious activity detected. This session should be reviewed immediately.'}
-
-          {isWarning    && '⚠ Some unusual behavior was detected. Manual review is recommended.'}
-
-          {isNormal     && '✅ No significant suspicious activity detected. Session appears clean.'}
-
-          {verdict === 'No Data' && 'Session ended with no detection data recorded.'}
-
-        </div>
-
-
-
-        <div className="modal-actions">
-
-          <button className="btn btn-primary" onClick={onClose}>Close</button>
-
-          <a className="btn" href="http://localhost:8000/report/" target="_blank" rel="noreferrer">
-
-            ↓ Download Report
-
-          </a>
+          <ModalStat
+            label="Suspicious"
+            value={suspCount}
+          />
 
         </div>
 
       </div>
 
     </div>
-
   );
-
 }
 
-
-
-function ModalStat({ label, value, color }) {
+function ModalStat({ label, value }) {
 
   return (
 
     <div className="modal-stat">
 
-      <div className="modal-stat__value" style={{ color: color || 'var(--text-primary)' }}>
-
+      <div className="modal-stat__value">
         {Math.round(value ?? 0)}
-
       </div>
 
-      <div className="modal-stat__label">{label}</div>
+      <div className="modal-stat__label">
+        {label}
+      </div>
 
     </div>
 
   );
-
 }
 
 
-
-// ── MAIN DASHBOARD ────────────────────────────────────────
-
+// MAIN DASHBOARD
 export default function DashboardPage() {
 
-  const [running, setRunning]     = useState(false);
+  const user = JSON.parse(
+    localStorage.getItem('user')
+  );
 
-  const [loading, setLoading]     = useState(false);
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
 
-  const [status, setStatus]       = useState({
+  // Admin blocked
+  if (user.role === 'admin') {
+    return <Navigate to="/history" />;
+  }
 
-    faces: 0, behavior: '—', lip: '—', score: 0, final: 'Camera Off'
+  const [running, setRunning] =
+    useState(false);
 
-  });
+  const [loading, setLoading] =
+    useState(false);
 
-  const [log, setLog]             = useState([]);
+  const [status, setStatus] =
+    useState({
+      faces: 0,
+      behavior: "—",
+      lip: "—",
+      score: 0,
+      final: "Camera Off"
+    });
 
-  const [error, setError]         = useState('');
+  const [error, setError] =
+    useState('');
 
-  const [showModal, setShowModal] = useState(false);
+  const [summary, setSummary] =
+    useState(null);
 
-  const [summary, setSummary]     = useState(null);
+  const [showModal, setShowModal] =
+    useState(false);
 
-  const [questionHistory, setQuestionHistory] = useState([]);
+  const [questionHistory, setQuestionHistory] =
+    useState([]);
 
-  const [showQuestionReport, setShowQuestionReport] = useState(false);
+  const [showQuestionReport, setShowQuestionReport] =
+    useState(false);
 
-  const intervalRef               = useRef(null);
-
-  const logEndRef                 = useRef(null);
-
-  const logRef                    = useRef([]);
-
-
-
-  const rawUser = localStorage.getItem('user');
-
-  const user    = rawUser ? JSON.parse(rawUser) : {};
-
-
-
-  // keep a ref in sync so handleStop reads latest log
-
-  useEffect(() => { logRef.current = log; }, [log]);
-
+  const intervalRef = useRef(null);
 
 
   const pollStatus = useCallback(async () => {
 
     try {
 
-      const data = await apiStatus();
+      const data =
+        await apiStatus();
 
       setStatus(data);
 
-      setLog(prev => {
-
-        const entry = { time: new Date().toLocaleTimeString(), ...data };
-
-        return [...prev.slice(-199), entry];
-
-      });
-
-    } catch { /* ignore */ }
+    } catch {}
 
   }, []);
-
 
 
   useEffect(() => {
 
     if (running) {
 
-      intervalRef.current = setInterval(pollStatus, POLL_INTERVAL);
+      intervalRef.current =
+        setInterval(
+          pollStatus,
+          POLL_INTERVAL
+        );
 
     } else {
 
-      clearInterval(intervalRef.current);
+      clearInterval(
+        intervalRef.current
+      );
 
     }
 
-    return () => clearInterval(intervalRef.current);
+    return () =>
+      clearInterval(
+        intervalRef.current
+      );
 
   }, [running, pollStatus]);
-
-
-
-  useEffect(() => {
-
-    logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-
-  }, [log]);
-
 
 
   async function handleStart() {
 
     setLoading(true);
 
-    setError('');
-
     try {
 
-      const data = await apiStart(user.id);
+      await apiStart(user.id);
 
-      if (data.error) { setError(data.error); }
-
-      else { setRunning(true); setLog([]); setSummary(null); }
+      setRunning(true);
 
     } catch {
 
-      setError('Failed to start camera.');
+      setError(
+        "Failed to start camera"
+      );
 
     }
 
     setLoading(false);
 
   }
-
 
 
   async function handleStop() {
@@ -732,87 +695,93 @@ export default function DashboardPage() {
 
       setRunning(false);
 
+      const suspicious =
+        status.final
+          ?.toLowerCase()
+          .includes("suspicious");
 
+      setSummary({
 
-      // compute summary from collected log
+        total: 1,
 
-      const snap      = logRef.current;
+        suspCount:
+          suspicious ? 1 : 0,
 
-      const total     = snap.length;
+        avgScore:
+          status.score || 0,
 
-      const suspCount = snap.filter(e => e.final?.toLowerCase().includes('suspicious')).length;
+        maxScore:
+          status.score || 0,
 
-      const avgScore  = total ? Math.round(snap.reduce((s, e) => s + (e.score || 0), 0) / total) : 0;
+        verdict:
+          suspicious
+            ? "Suspicious"
+            : "Normal"
 
-      const maxScore  = total ? Math.round(Math.max(...snap.map(e => e.score || 0))) : 0;
-
-      const verdict   = suspCount > total * 0.3 ? 'Suspicious'
-
-                      : suspCount > 0           ? 'Warning'
-
-                      : total > 0               ? 'Normal'
-
-                      : 'No Data';
-
-
-
-      setSummary({ total, suspCount, avgScore, maxScore, verdict });
+      });
 
       setShowModal(true);
 
-      
+      if (
+        questionHistory.length > 0
+      ) {
 
-      // Show question report if there are questions answered
-
-      if (questionHistory.length > 0) {
-
-        setShowQuestionReport(true);
+        setShowQuestionReport(
+          true
+        );
 
       }
 
-      
-
-      setStatus({ faces: 0, behavior: '—', lip: '—', score: 0, final: 'Camera Off' });
-
-    } catch { /* */ }
+    } catch {}
 
     setLoading(false);
 
   }
 
 
+  const alertLevel =
+    status.final
+      ?.toLowerCase()
+      .includes("suspicious")
 
-  const finalLower = (status.final || '').toLowerCase();
+      ? "danger"
 
-  const alertLevel = finalLower.includes('suspicious') ? 'danger'
+      : running
 
-                   : finalLower.includes('warning')    ? 'warn'
+      ? "ok"
 
-                   : running                            ? 'ok'
-
-                   : 'off';
-
+      : "off";
 
 
   return (
 
     <div className="dash">
 
-      {/* HEADER */}
+      {/* Header */}
 
       <header className="dash__header">
 
-        <div className="dash__header-left">
+        <div
+          className="dash__header-left"
+        >
 
-          <div className={`live-dot live-dot--${alertLevel}`} />
+          <div
+            className={`live-dot live-dot--${alertLevel}`}
+          />
 
           <div>
 
-            <h1 className="dash__title">Live Monitor</h1>
+            <h1 className="dash__title">
 
-            <p className="dash__subtitle mono">
+              Live Interview Monitoring
 
-              {running ? `Monitoring · ${new Date().toLocaleTimeString()}` : 'Session Inactive'}
+            </h1>
+
+            <p className="dash__subtitle">
+
+              {running
+                ? "Monitoring..."
+                : "Session Inactive"}
 
             </p>
 
@@ -820,81 +789,61 @@ export default function DashboardPage() {
 
         </div>
 
-        <div className="dash__header-right">
+        <button
+          className={
+            running
+              ? "btn btn-danger"
+              : "btn btn-primary"
+          }
+          onClick={
+            running
+              ? handleStop
+              : handleStart
+          }
+          disabled={loading}
+        >
 
-          <a className="btn" href={reportUrl()} target="_blank" rel="noreferrer">
+          {running
+            ? "■ Stop Session"
+            : "▶ Start Session"}
 
-            ↓ Full Report
-
-          </a>
-
-          {!running ? (
-
-            <button className="btn btn-primary" onClick={handleStart} disabled={loading}>
-
-              {loading ? '◌ Starting…' : '▶ Start Session'}
-
-            </button>
-
-          ) : (
-
-            <button className="btn btn-danger" onClick={handleStop} disabled={loading}>
-
-              {loading ? '◌ Stopping…' : '■ End Session'}
-
-            </button>
-
-          )}
-
-        </div>
+        </button>
 
       </header>
 
+      {error && (
 
+        <div className="dash__error">
 
-      {error && <div className="dash__error">{error}</div>}
+          {error}
 
+        </div>
 
-
-      {/* BODY */}
+      )}
 
       <div className="dash__body">
 
+        {/* Camera */}
+
         <div className="dash__video-col">
 
-          <div className="video-panel card">
-
-            <div className="video-panel__topbar">
-
-              <span className="mono" style={{ fontSize: 11, color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
-
-                CAMERA FEED
-
-              </span>
-
-              <div className={`live-pill ${running ? 'live-pill--on' : ''}`}>
-
-                {running ? '● LIVE' : '○ OFFLINE'}
-
-              </div>
-
-            </div>
-
-
+          <div className="video-panel">
 
             <div className="video-panel__frame">
 
               {running ? (
 
-                <img src={videoFeedUrl()} alt="Live feed" className="video-panel__img" />
+                <img
+                  src={videoFeedUrl()}
+                  alt="camera"
+                  className="video-panel__img"
+                />
 
               ) : (
 
                 <div className="video-panel__placeholder">
 
-                  <span className="video-panel__placeholder-icon">⬡</span>
-
-                  <span>Start a session to begin monitoring</span>
+                  Start session to begin monitoring
 
                 </div>
 
@@ -902,64 +851,51 @@ export default function DashboardPage() {
 
             </div>
 
-
-
-            {running && alertLevel === 'danger' && (
-
-              <div className="alert-banner alert-banner--danger">⚠ SUSPICIOUS ACTIVITY DETECTED</div>
-
-            )}
-
-            {running && alertLevel === 'warn' && (
-
-              <div className="alert-banner alert-banner--warn">⚡ WARNING — Unusual behavior</div>
-
-            )}
-
           </div>
 
         </div>
 
 
+        {/* Right Section */}
 
         <div className="dash__stats-col">
 
-          <div className="card score-block">
+          <div className="score-block">
 
-            <ScoreRing score={status.score} size={110} />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "15px"
+              }}
+            >
 
-            <div className="score-block__info">
+              <ScoreRing
+                score={status.score}
+                size={100}
+              />
 
-              <div className="score-block__status">
-
-                <StatusBadge status={status.final} />
-
-              </div>
+              <StatusBadge
+                status={status.final}
+              />
 
             </div>
 
           </div>
 
-
-
-          <QuestionsPanel 
-
+          <QuestionsPanel
             isRunning={running}
-
-            onQuestionAsked={(question) => {
-
-              console.log('Question asked:', question);
-
-            }}
-
             onQuestionAnswered={(result) => {
 
-              console.log('Question answered:', result);
-
-              setQuestionHistory(prev => [result, ...prev]);
+              setQuestionHistory(
+                prev => [
+                  result,
+                  ...prev
+                ]
+              );
 
             }}
-
           />
 
         </div>
@@ -967,59 +903,24 @@ export default function DashboardPage() {
       </div>
 
 
-
-      {/* FINAL RESULT MODAL */}
-
-      {showModal && summary && (
-
-        <ResultModal summary={summary} onClose={() => setShowModal(false)} />
-
-      )}
-
-
-
-      {/* QUESTION REPORT MODAL */}
-
       {showQuestionReport && (
 
-        <QuestionReportModal 
-
+        <QuestionReportModal
           isOpen={showQuestionReport}
-
-          onClose={() => setShowQuestionReport(false)}
-
+          onClose={() =>
+            setShowQuestionReport(false)
+          }
           questionHistory={questionHistory}
-
           totalQuestions={20}
-
-          sessionDuration={questionHistory.length * 120} // Approximate duration
-
+          sessionDuration={
+            questionHistory.length * 120
+          }
           detectionSummary={summary}
-
         />
 
       )}
 
     </div>
-
-  );
-
-}
-
-
-
-function MetaRow({ label, value }) {
-
-  return (
-
-    <div className="meta-row">
-
-      <span className="meta-row__label">{label}</span>
-
-      <span className="meta-row__value mono">{value ?? '—'}</span>
-
-    </div>
-
   );
 
 }

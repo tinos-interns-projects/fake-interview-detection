@@ -7,6 +7,51 @@
   margin-bottom: 16px;
 }
 
+/* Main question card */
+.questions-panel__current {
+    min-height: 320px;   /* increase card height */
+    padding: 35px;
+    border-radius: 20px;
+}
+
+/* Question text */
+.questions-panel__question-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 26px;     /* bigger text */
+    line-height: 2.8;
+    margin-top: 25px;
+    margin-bottom: 30px;
+    font-weight: 800;
+}
+
+/* Category and difficulty */
+.questions-panel__current-header {
+    margin-bottom: 25px;
+}
+
+.questions-panel__category,
+.questions-panel__difficulty {
+    font-size: 15px;
+    padding: 8px 16px;
+}
+
+/* Answer buttons */
+.questions-panel__actions {
+    margin-top: 40px;
+    gap: 20px;
+}
+
+.questions-panel__btn {
+    height: 55px;
+    font-size: 18px;
+    border-radius: 12px;
+}
+
+/* Entire panel larger */
+.questions-panel {
+    min-height: 650px;
+}    
+
 /* Statistics Styles */
 .questions-panel__stats {
   background: var(--accent-bg);

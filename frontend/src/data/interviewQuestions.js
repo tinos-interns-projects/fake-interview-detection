@@ -4,7 +4,6 @@ export const interviewQuestions = [
     id: 1,
     category: "Technical",
     question: "Can you explain the difference between React hooks and class components?",
-    difficulty: "Medium",
     timeLimit: 120,
     tags: ["React", "JavaScript", "Frontend"]
   },
@@ -12,7 +11,6 @@ export const interviewQuestions = [
     id: 2,
     category: "Behavioral",
     question: "Tell me about a time when you had to deal with a difficult team member.",
-    difficulty: "Easy",
     timeLimit: 90,
     tags: ["Teamwork", "Communication", "Problem-solving"]
   },
@@ -20,7 +18,6 @@ export const interviewQuestions = [
     id: 3,
     category: "Technical",
     question: "How would you optimize the performance of a web application?",
-    difficulty: "Hard",
     timeLimit: 150,
     tags: ["Performance", "Optimization", "Web Development"]
   },
@@ -28,7 +25,6 @@ export const interviewQuestions = [
     id: 4,
     category: "System Design",
     question: "Design a URL shortening service like bit.ly.",
-    difficulty: "Hard",
     timeLimit: 180,
     tags: ["System Design", "Architecture", "Scalability"]
   },
@@ -36,7 +32,6 @@ export const interviewQuestions = [
     id: 5,
     category: "Behavioral",
     question: "Why do you want to work for our company?",
-    difficulty: "Easy",
     timeLimit: 60,
     tags: ["Motivation", "Company Culture", "Career Goals"]
   },
@@ -44,7 +39,6 @@ export const interviewQuestions = [
     id: 6,
     category: "Technical",
     question: "What is the Event Loop in JavaScript?",
-    difficulty: "Medium",
     timeLimit: 120,
     tags: ["JavaScript", "Async", "Core Concepts"]
   },
@@ -52,7 +46,6 @@ export const interviewQuestions = [
     id: 7,
     category: "Problem Solving",
     question: "How would you handle a situation where you disagree with your manager's technical decision?",
-    difficulty: "Medium",
     timeLimit: 90,
     tags: ["Communication", "Leadership", "Conflict Resolution"]
   },
@@ -60,7 +53,6 @@ export const interviewQuestions = [
     id: 8,
     category: "Technical",
     question: "Explain RESTful API design principles.",
-    difficulty: "Medium",
     timeLimit: 120,
     tags: ["API", "REST", "Backend"]
   },
@@ -68,7 +60,6 @@ export const interviewQuestions = [
     id: 9,
     category: "Technical",
     question: "What is the difference between let, const, and var in JavaScript?",
-    difficulty: "Easy",
     timeLimit: 90,
     tags: ["JavaScript", "ES6", "Variables"]
   },
@@ -76,7 +67,6 @@ export const interviewQuestions = [
     id: 10,
     category: "Behavioral",
     question: "Describe a challenging project you worked on and how you overcame obstacles.",
-    difficulty: "Medium",
     timeLimit: 120,
     tags: ["Project Management", "Problem-solving", "Leadership"]
   },
@@ -84,7 +74,6 @@ export const interviewQuestions = [
     id: 11,
     category: "Technical",
     question: "How does CSS specificity work?",
-    difficulty: "Medium",
     timeLimit: 100,
     tags: ["CSS", "Styling", "Frontend"]
   },
@@ -92,7 +81,6 @@ export const interviewQuestions = [
     id: 12,
     category: "System Design",
     question: "Design a messaging app like WhatsApp.",
-    difficulty: "Hard",
     timeLimit: 200,
     tags: ["System Design", "Real-time", "Architecture"]
   },
@@ -100,7 +88,6 @@ export const interviewQuestions = [
     id: 13,
     category: "Technical",
     question: "What is CORS and how do you handle it?",
-    difficulty: "Medium",
     timeLimit: 100,
     tags: ["Web Security", "API", "HTTP"]
   },
@@ -108,7 +95,6 @@ export const interviewQuestions = [
     id: 14,
     category: "Behavioral",
     question: "How do you stay updated with the latest technology trends?",
-    difficulty: "Easy",
     timeLimit: 80,
     tags: ["Learning", "Professional Development", "Technology"]
   },
@@ -116,7 +102,6 @@ export const interviewQuestions = [
     id: 15,
     category: "Technical",
     question: "Explain the concept of closures in JavaScript.",
-    difficulty: "Hard",
     timeLimit: 140,
     tags: ["JavaScript", "Advanced", "Functions"]
   },
@@ -124,7 +109,6 @@ export const interviewQuestions = [
     id: 16,
     category: "Problem Solving",
     question: "How would you debug a slow-loading web page?",
-    difficulty: "Medium",
     timeLimit: 110,
     tags: ["Debugging", "Performance", "Web Development"]
   },
@@ -132,7 +116,6 @@ export const interviewQuestions = [
     id: 17,
     category: "Technical",
     question: "What is the Virtual DOM and how does it work?",
-    difficulty: "Medium",
     timeLimit: 120,
     tags: ["React", "Performance", "Frontend"]
   },
@@ -140,7 +123,6 @@ export const interviewQuestions = [
     id: 18,
     category: "Behavioral",
     question: "Tell me about a time you failed at something and what you learned.",
-    difficulty: "Easy",
     timeLimit: 90,
     tags: ["Learning", "Growth Mindset", "Resilience"]
   },
@@ -148,7 +130,6 @@ export const interviewQuestions = [
     id: 19,
     category: "System Design",
     question: "Design a social media feed like Instagram.",
-    difficulty: "Hard",
     timeLimit: 180,
     tags: ["System Design", "Database", "Scalability"]
   },
@@ -156,7 +137,6 @@ export const interviewQuestions = [
     id: 20,
     category: "Technical",
     question: "What are promises and async/await in JavaScript?",
-    difficulty: "Medium",
     timeLimit: 110,
     tags: ["JavaScript", "Async", "ES6"]
   }

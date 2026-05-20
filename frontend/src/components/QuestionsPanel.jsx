@@ -227,7 +227,7 @@ const QuestionsPanel = ({ isRunning, onQuestionAsked, onQuestionAnswered }) => {
         </div>
       )}
 
-      {/* Recent History */}
+      {/* Recent History
       {questionHistory.length > 0 && (
         <div className="questions-panel__history">
           <div className="questions-panel__history-header">
@@ -254,7 +254,7 @@ const QuestionsPanel = ({ isRunning, onQuestionAsked, onQuestionAnswered }) => {
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
